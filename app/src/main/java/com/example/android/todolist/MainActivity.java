@@ -11,7 +11,11 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.android.todolist.database.TaskDatabase;
+import com.example.android.todolist.database.TaskEntry;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.List;
 
 import static androidx.recyclerview.widget.DividerItemDecoration.VERTICAL;
 
@@ -23,17 +27,26 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.ItemC
     // Member variables for the adapter and RecyclerView
     private RecyclerView mRecyclerView;
     private TaskAdapter mAdapter;
+    private TaskDatabase mOB;
+    private AppExecutors roomExecutor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        roomExecutor = AppExecutors.getInstance();
         // Set the RecyclerView to its corresponding view
         mRecyclerView = findViewById(R.id.recyclerViewTasks);
 
         // Set the layout for the RecyclerView to be a linear layout, which measures and
         // positions items within a RecyclerView into a linear list
+
+        mRecyclerView = findViewById(R.id.recyclerViewTasks);
+        //mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        // Set the layout for the RecyclerView to be a linear layout, which measures and
+        // positions items within a RecyclerView into a linear list.
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         // Initialize the adapter and attach it to the RecyclerView
@@ -58,6 +71,16 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.ItemC
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 // Here is where you'll implement swipe to delete
+                final List<TaskEntry> taskList = mAdapter.getTasks();
+                final int position = viewHolder.getAdapterPosition();
+
+                roomExecutor.getDiskIO().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        mOB.taskDAO().delete(taskList.get(position));
+                    }
+                });
+
             }
         }).attachToRecyclerView(mRecyclerView);
 
@@ -76,10 +99,39 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.ItemC
                 startActivity(addTaskIntent);
             }
         });
+        mOB = TaskDatabase.getInstance(getApplicationContext());
     }
 
     @Override
     public void onItemClickListener(int itemId) {
         // Launch AddTaskActivity adding the itemId as an extra in the intent
     }
-}
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        refershList();
+    }
+
+    private void refershList() {
+        AppExecutors.getInstance().getDiskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                final List<TaskEntry> taskEntries = mOB.taskDAO().getAllTasks();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAdapter.setTasks(taskEntries);
+                    }
+                });
+            }
+        });
+    }
+};
+
+
+// Complete Back to Beginning of the code status
+// Second Part Complete of ACC6
+// Third Part Complete of ACC7
+// Fourth Part  ACC8

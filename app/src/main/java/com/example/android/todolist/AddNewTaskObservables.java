@@ -9,14 +9,14 @@ import androidx.databinding.ObservableBoolean;
 import androidx.databinding.ObservableField;
 import androidx.databinding.ObservableInt;
 
-    public class AddNewTaskObservables{
+    public class AddNewTaskObservables extends BaseObservable{
 
-//        private ObservableField<String> taskName=new ObservableField<>();
+        private ObservableField<String> taskName=new ObservableField<>();
 //
-//        public  ObservableField<String> getTaskName()
-//        {
-//            return taskName;
-//        }
+        public  ObservableField<String> getTaskName()
+        {
+            return taskName;
+        }
 //
 //        public void setValues(TaskEntry values) {
 //            taskName.set(values.getDescription());

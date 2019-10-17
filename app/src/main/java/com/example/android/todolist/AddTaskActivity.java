@@ -8,6 +8,8 @@ import android.widget.EditText;
 import android.widget.RadioGroup;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 
 import com.example.android.todolist.database.TaskDatabase;
 import com.example.android.todolist.database.TaskEntry;
@@ -54,12 +56,14 @@ public class AddTaskActivity extends AppCompatActivity {
             if (mTaskId == DEFAULT_TASK_ID) {
                 // populate the UI
                 mTaskId = intent.getIntExtra(EXTRA_TASK_ID, 0);
-                roomExecutor.getDiskIO().execute(new Runnable() {
+                final LiveData<TaskEntry> taskEntry = mOb.taskDAO().getTaskById(mTaskId);
+                taskEntry.observe(this, new Observer<TaskEntry>() {
                     @Override
-                    public void run() {
-                        TaskEntry taskEntry = mOb.taskDAO().getTaskById(mTaskId);
-                        populateUI(taskEntry);
+                    public void onChanged(TaskEntry entry) {
+                        taskEntry.removeObserver(this);
+                        populateUI(entry);
                     }
+
                 });
             }
         }

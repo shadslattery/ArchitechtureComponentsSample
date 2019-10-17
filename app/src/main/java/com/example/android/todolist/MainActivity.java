@@ -7,6 +7,8 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -79,7 +81,6 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.ItemC
                     @Override
                     public void run() {
                         mOB.taskDAO().delete(taskList.get(position));
-                        refershList();
                     }
                 });
 
@@ -101,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.ItemC
                 startActivity(addTaskIntent);
             }
         });
-        mOB = TaskDatabase.getInstance(getApplicationContext());
+        refershList();
     }
 
     @Override
@@ -113,21 +114,15 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.ItemC
     protected void onResume() {
         super.onResume();
 
-        refershList();
     }
 
     private void refershList() {
         Log.e(TAG,"Refresh Called");
-        AppExecutors.getInstance().getDiskIO().execute(new Runnable() {
+        final LiveData<List<TaskEntry>> taskEntriesLiveData = mOB.taskDAO().getAllTasks();
+        taskEntriesLiveData.observe(this, new Observer<List<TaskEntry>>() {
             @Override
-            public void run() {
-                final List<TaskEntry> taskEntries = mOB.taskDAO().getAllTasks();
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mAdapter.setTasks(taskEntries);
-                    }
-                });
+            public void onChanged(List<TaskEntry> taskEntries) {
+                mAdapter.setTasks(taskEntries);
             }
         });
     }

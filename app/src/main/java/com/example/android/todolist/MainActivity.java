@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -118,15 +119,16 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.ItemC
 
     private void refershList() {
         Log.e(TAG,"Refresh Called");
+        MainViewModel viewModel= ViewModelProviders.of(this).get(MainViewModel.class);
         final LiveData<List<TaskEntry>> taskEntriesLiveData = mOB.taskDAO().getAllTasks();
-        taskEntriesLiveData.observe(this, new Observer<List<TaskEntry>>() {
+        viewModel.getLiveDataTasks().observe(this, new Observer<List<TaskEntry>>() {
             @Override
             public void onChanged(List<TaskEntry> taskEntries) {
                 mAdapter.setTasks(taskEntries);
             }
         });
     }
-};
+}
 
 
 // Complete Back to Beginning of the code status

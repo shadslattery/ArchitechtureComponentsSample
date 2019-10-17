@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.ItemC
                 startActivity(addTaskIntent);
             }
         });
-        refershList();
+        // refershList();
     }
 
     @Override

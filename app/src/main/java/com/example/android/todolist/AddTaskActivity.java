@@ -10,6 +10,7 @@ import android.widget.RadioGroup;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.example.android.todolist.database.TaskDatabase;
 import com.example.android.todolist.database.TaskEntry;
@@ -56,11 +57,12 @@ public class AddTaskActivity extends AppCompatActivity {
             if (mTaskId == DEFAULT_TASK_ID) {
                 // populate the UI
                 mTaskId = intent.getIntExtra(EXTRA_TASK_ID, 0);
-                final LiveData<TaskEntry> taskEntry = mOb.taskDAO().getTaskById(mTaskId);
-                taskEntry.observe(this, new Observer<TaskEntry>() {
+                ViewModelFactory viewModelFactory=new ViewModelFactory(mOb,mTaskId);
+                final AddTaskViewModel addTaskViewModel= ViewModelProviders.of(this,viewModelFactory).get(AddTaskViewModel.class);
+                addTaskViewModel.getTaskEntryLiveData().observe(this, new Observer<TaskEntry>() {
                     @Override
                     public void onChanged(TaskEntry entry) {
-                        taskEntry.removeObserver(this);
+                        addTaskViewModel.getTaskEntryLiveData().removeObserver(this);
                         populateUI(entry);
                     }
 

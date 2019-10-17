@@ -18,6 +18,20 @@ public class ViewModelFactory extends ViewModelProvider.NewInstanceFactory {
     @NonNull
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-        return (T) new AddTaskViewModel(taskId,mOB);
+        return(T) new AddTaskViewModel(taskId,mOB);
+
     }
+
+
+    /*Wait until he adds this info below
+    public ViewModelFactory(TaskDatabase mOB, int taskId) {
+        this.mOB = mOB;
+        this.taskId = taskId;
+    }
+
+    @NonNull
+    @Override
+    public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+        return (T) new AddTaskViewModel(taskId,mOB);
+    }*/
 }

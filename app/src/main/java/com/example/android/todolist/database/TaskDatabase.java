@@ -11,7 +11,7 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 import androidx.sqlite.db.SupportSQLiteOpenHelper;
 
-@Database(entities = {TaskEntry.class},version = 1,exportSchema = false)
+@Database(entities = {TaskEntry.class},version = 2,exportSchema = false)
 @TypeConverters({DateConvertor.class})
 public abstract class TaskDatabase extends RoomDatabase {
 

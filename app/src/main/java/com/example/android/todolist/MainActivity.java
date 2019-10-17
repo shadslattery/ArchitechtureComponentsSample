@@ -2,6 +2,7 @@ package com.example.android.todolist;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -78,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.ItemC
                     @Override
                     public void run() {
                         mOB.taskDAO().delete(taskList.get(position));
+                        refershList();
                     }
                 });
 
@@ -115,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.ItemC
     }
 
     private void refershList() {
+        Log.e(TAG,"Refresh Called");
         AppExecutors.getInstance().getDiskIO().execute(new Runnable() {
             @Override
             public void run() {

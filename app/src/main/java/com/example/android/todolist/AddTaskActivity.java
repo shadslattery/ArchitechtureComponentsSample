@@ -33,6 +33,7 @@ public class AddTaskActivity extends AppCompatActivity {
     RadioGroup mRadioGroup;
     Button mButton;
     private TaskDatabase mOb;
+    private AppExecutors roomExecutor;
 
     private int mTaskId = DEFAULT_TASK_ID;
 
@@ -40,20 +41,29 @@ public class AddTaskActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
 
+        roomExecutor=AppExecutors.getInstance();
         initViews();
 
         if (savedInstanceState != null && savedInstanceState.containsKey(INSTANCE_TASK_ID)) {
             mTaskId = savedInstanceState.getInt(INSTANCE_TASK_ID, DEFAULT_TASK_ID);
         }
-
+        mOb=TaskDatabase.getInstance(getApplicationContext());
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(EXTRA_TASK_ID)) {
             mButton.setText(R.string.update_button);
             if (mTaskId == DEFAULT_TASK_ID) {
                 // populate the UI
+                mTaskId = intent.getIntExtra(EXTRA_TASK_ID, 0);
+                roomExecutor.getDiskIO().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        TaskEntry taskEntry = mOb.taskDAO().getTaskById(mTaskId);
+                        populateUI(taskEntry);
+                    }
+                });
             }
         }
-        mOb=TaskDatabase.getInstance(getApplicationContext());
+
     }
 
     @Override
@@ -99,11 +109,23 @@ public class AddTaskActivity extends AppCompatActivity {
 
         Date date = new Date();
 
-        TaskEntry taskEntry = new TaskEntry(description,priority,date);
+        final TaskEntry taskEntry = new TaskEntry(description, priority, date);
 
-        mOb.taskDAO().insert(taskEntry);
+        roomExecutor.getDiskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                if (mTaskId == DEFAULT_TASK_ID)
+                {
+                    mOb.taskDAO().insert(taskEntry);
+                }
+                else
+                 {
+                     taskEntry.setId(mTaskId);
+                 }
 
-        finish();
+                finish();
+            }
+        });
     }
 
     /**

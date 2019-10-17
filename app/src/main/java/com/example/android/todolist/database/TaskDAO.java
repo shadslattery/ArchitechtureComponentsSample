@@ -14,7 +14,7 @@ import androidx.room.Update;
 public interface TaskDAO {
 
     @Query("Select * from task_entry ORDER BY priority")
-    List<TaskEntry> getAllTasks();
+    LiveData<List<TaskEntry>> getAllTasks();
 
     @Insert
     void insert(TaskEntry entry);
@@ -29,3 +29,4 @@ public interface TaskDAO {
     LiveData<TaskEntry> getTaskById(int taskID);
 
 }
+// Video AAC10 - With No Red Errors
